@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ingovernabile — Tracker Sovranità Digitale</title>
+<meta name="description" content="Checklist operativa e generatori per riprendere il controllo di comunicazioni, dati e strumenti davanti a Chat Control.">
+<meta name="theme-color" content="#0a0d10">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ingovernabile">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+  :root{
+    --bg:#0a0d10;
+    --bg2:#12161b;
+    --card:#161b21;
+    --card-hover:#1c222a;
+    --border:#242b33;
+    --text:#e8edf2;
+    --muted:#8a97a3;
+    --muted2:#5c6772;
+    --g:#22c55e;   /* cittadino */
+    --y:#eab308;   /* pseudonimo */
+    --r:#ef4444;   /* whistleblower */
+    --accent:#3ecf8e;
+    --accent-dim:rgba(62,207,142,.12);
+    --radius:14px;
+    --maxw:1160px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  a{color:var(--accent);}
+  ::selection{background:var(--accent-dim);color:var(--accent);}
+
+  .shell{ max-width:var(--maxw); margin:0 auto; padding:0 clamp(12px,4vw,32px); }
+
+  header.top{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,13,16,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .top-inner{
+    max-width:var(--maxw); margin:0 auto; padding:10px clamp(12px,4vw,32px);
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  }
+  .brand{
+    display:flex; align-items:center; gap:8px; font-weight:800; letter-spacing:.02em;
+    font-size:clamp(15px,3.6vw,18px); margin-right:auto; white-space:nowrap;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
+  .menu-btn{
+    display:none; background:var(--card); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:8px 10px; cursor:pointer; font-size:16px;
+  }
+  .progress-pill{
+    display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border);
+    border-radius:999px; padding:6px 12px; font-size:13px; color:var(--muted); white-space:nowrap;
+  }
+  .progress-pill b{color:var(--accent); font-variant-numeric:tabular-nums;}
+  .progress-ring{width:22px;height:22px;flex:none;}
+
+  .hero{padding:clamp(20px,5vw,44px) 0 clamp(10px,3vw,20px);}
+  .hero .eyebrow{
+    display:inline-block; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--y); background:rgba(234,179,8,.1); border:1px solid rgba(234,179,8,.3);
+    padding:4px 10px; border-radius:999px; margin-bottom:14px;
+  }
+  .hero h1{ font-size:clamp(26px,5.6vw,44px); margin:0 0 12px; line-height:1.08; font-weight:800; letter-spacing:-0.01em; }
+  .hero p.lead{ color:var(--muted); font-size:clamp(14px,2.4vw,17px); max-width:62ch; margin:0 0 22px; }
+
+  .profiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:18px; }
+  .profile-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px 16px; cursor:pointer; transition:.15s; position:relative;
+  }
+  .profile-card:hover{background:var(--card-hover);}
+  .profile-card.active{border-color:var(--pc); box-shadow:0 0 0 1px var(--pc) inset, 0 0 24px -8px var(--pc);}
+  .profile-card[data-level="g"]{--pc:var(--g);}
+  .profile-card[data-level="y"]{--pc:var(--y);}
+  .profile-card[data-level="r"]{--pc:var(--r);}
+  .profile-card .pt{font-weight:700; font-size:14.5px; display:flex; align-items:center; gap:8px;}
+  .profile-card .pt .sw{width:10px;height:10px;border-radius:50%;background:var(--pc);}
+  .profile-card .pd{color:var(--muted); font-size:12.5px; margin-top:4px;}
+  .profile-card.active .pt{color:var(--pc);}
+
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .search{ flex:1 1 240px; position:relative; }
+  .search input{
+    width:100%; background:var(--card); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:11px 14px 11px 36px; font-size:14.5px; outline:none;
+  }
+  .search input:focus{border-color:var(--accent);}
+  .search svg{position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:.5;}
+  .btn{
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:10px 14px; font-size:13.5px; cursor:pointer; white-space:nowrap;
+  }
+  .btn:hover{background:var(--card-hover);}
+  .btn.accent{background:var(--accent); color:#04120b; border-color:var(--accent); font-weight:700;}
+  .btn.accent:hover{filter:brightness(1.08);}
+
+  .layout{ display:grid; grid-template-columns:230px minmax(0,1fr); gap:28px; margin-top:22px; align-items:start; }
+  nav.toc{ position:sticky; top:70px; max-height:calc(100vh - 90px); overflow:auto; padding-right:6px; }
+  nav.toc a{
+    display:flex; justify-content:space-between; gap:8px; color:var(--muted); text-decoration:none;
+    font-size:13px; padding:7px 10px; border-radius:8px; margin-bottom:2px;
+  }
+  nav.toc a:hover{background:var(--card); color:var(--text);}
+  nav.toc a.active{background:var(--accent-dim); color:var(--accent); font-weight:600;}
+  nav.toc a .cnt{font-variant-numeric:tabular-nums; color:var(--muted2); font-size:11px;}
+
+  .overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:60; }
+  main{min-width:0;}
+
+  .cat{
+    border:1px solid var(--border); border-radius:var(--radius); margin-bottom:14px;
+    overflow:hidden; background:var(--bg2); scroll-margin-top:70px;
+  }
+  .cat-head{ display:flex; align-items:center; gap:12px; padding:16px 18px; cursor:pointer; user-select:none; }
+  .cat-head .ic{font-size:20px; flex:none;}
+  .cat-head .ti{flex:1; min-width:0;}
+  .cat-head h2{margin:0; font-size:clamp(15px,2.6vw,17px); font-weight:700;}
+  .cat-head .sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .cat-head .stat{ font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; flex:none; }
+  .cat-head .chev{transition:.2s; color:var(--muted2); flex:none;}
+  .cat.open .chev{transform:rotate(90deg);}
+  .catbar{height:3px; background:var(--border);}
+  .catbar i{display:block; height:100%; background:var(--accent); width:0%; transition:.3s;}
+
+  .cat-body{display:none; padding:4px 14px 16px;}
+  .cat.open .cat-body{display:block;}
+  .cat-intro{color:var(--muted); font-size:13px; padding:0 4px 12px; max-width:76ch;}
+
+  .items{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; }
+
+  .item{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; transition:.15s; }
+  .item.done{border-color:rgba(62,207,142,.35); background:linear-gradient(180deg,rgba(62,207,142,.06),transparent 40%),var(--card);}
+  .item.hidden{display:none;}
+  .item-head{display:flex; gap:10px; align-items:flex-start;}
+  .chk{
+    flex:none; width:20px;height:20px; border-radius:6px; border:1.5px solid var(--muted2);
+    margin-top:2px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:.15s; background:transparent;
+  }
+  .chk:hover{border-color:var(--accent);}
+  .item.done .chk{background:var(--accent); border-color:var(--accent);}
+  .chk svg{opacity:0; transform:scale(.6); transition:.15s;}
+  .item.done .chk svg{opacity:1; transform:scale(1);}
+
+  .item-body{flex:1; min-width:0;}
+  .item-title-row{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .item-name{font-weight:700; font-size:14.5px;}
+  .item.done .item-name{color:var(--accent);}
+  .flag{font-size:12px; color:var(--muted2);}
+  .badges{display:flex; gap:4px; margin-left:auto;}
+  .lvl{ width:9px;height:9px;border-radius:50%; opacity:.25; flex:none; }
+  .lvl.g{background:var(--g);} .lvl.y{background:var(--y);} .lvl.r{background:var(--r);}
+  .lvl.on{opacity:1;}
+
+  .item-tag{
+    display:inline-block; font-size:11px; color:var(--muted); background:var(--bg2);
+    border:1px solid var(--border); padding:2px 7px; border-radius:999px; margin-top:5px;
+  }
+  .item-desc{color:var(--muted); font-size:12.8px; margin-top:6px; line-height:1.5;}
+
+  .item-toggle{
+    background:none; border:none; color:var(--accent); font-size:12px; font-weight:600;
+    cursor:pointer; padding:8px 0 0; display:flex; align-items:center; gap:4px;
+  }
+  .item-detail{display:none; margin-top:8px; border-top:1px dashed var(--border); padding-top:10px;}
+  .item.expanded .item-detail{display:block;}
+  .item.expanded .item-toggle svg{transform:rotate(180deg);}
+  .item-why{font-size:12.5px; color:var(--text); margin-bottom:8px;}
+  .item-why b{color:var(--accent);}
+  .steps{margin:0; padding-left:18px; font-size:12.5px; color:var(--muted);}
+  .steps li{margin-bottom:4px;}
+  .item-link{
+    display:inline-flex; align-items:center; gap:5px; margin-top:10px;
+    font-size:12.5px; font-weight:600; color:var(--accent); text-decoration:none;
+  }
+  .item-link:hover{text-decoration:underline;}
+
+  .not-recommended{opacity:.4;}
+
+  .gen-section{margin-top:22px; margin-bottom:22px;}
+  .gen-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; }
+  .gen-card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  .gen-card h3{margin:0 0 8px; font-size:15px;}
+  .gen-note{color:var(--muted); font-size:12.5px; line-height:1.55; margin:0 0 12px;}
+  .gen-row{display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
+  .gen-row input{
+    flex:1 1 140px; background:var(--bg2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:9px 11px; font-size:13px; outline:none; font-family:inherit;
+  }
+  .gen-row input:focus{border-color:var(--accent);}
+  .gen-status{margin-left:10px; font-size:12.5px; color:var(--muted);}
+  .gen-status.err{color:var(--r);}
+  .gen-status.ok{color:var(--accent);}
+  .gen-output{margin-top:14px;}
+  .gen-output label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px; font-weight:600;}
+  .gen-output textarea{
+    width:100%; background:var(--bg2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:10px; font-size:11.5px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    resize:vertical; line-height:1.4;
+  }
+  .gen-actions{display:flex; gap:8px; margin-top:6px;}
+  .tag-ok{font-size:10.5px; font-weight:500; color:var(--accent); background:var(--accent-dim); padding:2px 7px; border-radius:999px; margin-left:6px;}
+  .tag-warn{font-size:10.5px; font-weight:500; color:var(--r); background:rgba(239,68,68,.12); padding:2px 7px; border-radius:999px; margin-left:6px;}
+
+  footer{
+    max-width:var(--maxw); margin:40px auto 0; padding:20px clamp(12px,4vw,32px);
+    color:var(--muted2); font-size:12px; border-top:1px solid var(--border);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  .toast{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none;
+    transition:.25s; z-index:100;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* ---------- Ad slots ---------- */
+  .ad-label{
+    font-size:9px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted2);
+    text-align:center; padding:3px 0;
+  }
+  .ad-link{display:block; text-align:center;}
+  .ad-banner-slot{
+    display:none; width:100%; background:var(--bg2); border-bottom:1px solid var(--border);
+  }
+  .ad-banner-slot img{ max-width:100%; max-height:90px; height:auto; display:inline-block; }
+  .ad-square-slot{
+    display:none; width:300px; max-width:100%; margin:0 auto 26px;
+    background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:10px;
+  }
+  .ad-square-slot img{ width:100%; height:auto; border-radius:8px; display:block; }
+  .ad-placeholder{
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
+    color:var(--muted2); font-size:12px; text-align:center; padding:18px 10px;
+    border:1px dashed var(--border); border-radius:8px; min-height:60px;
+  }
+  .ad-placeholder small{color:var(--muted2); font-size:10px;}
+  .ad-banner-slot .ad-placeholder{ border:none; border-radius:0; min-height:70px; }
+
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{
+      position:fixed; top:0; left:0; bottom:0; width:min(78vw,300px); z-index:70;
+      background:var(--bg2); border-right:1px solid var(--border);
+      transform:translateX(-100%); transition:.25s; padding:16px; max-height:none;
+    }
+    nav.toc.open{transform:translateX(0);}
+    .overlay.show{display:block;}
+    .menu-btn{display:inline-flex; align-items:center; gap:6px;}
+  }
+  @media (max-width:520px){
+    .items{grid-template-columns:1fr;}
+    .progress-pill span.lbl{display:none;}
+    .hero .eyebrow{font-size:10.5px;}
+  }
+  @media (min-width:1400px){
+    :root{--maxw:1320px;}
+    .items{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <button class="menu-btn" id="menuBtn" aria-label="Apri indice">☰ <span>Indice</span></button>
+    <div class="brand"><span class="dot"></span> INGOVERNABILE_</div>
+    <div class="progress-pill">
+      <svg class="progress-ring" viewBox="0 0 36 36">
+        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#242b33" stroke-width="3.5"/>
+        <path id="ringFg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#3ecf8e" stroke-width="3.5" stroke-dasharray="0,100" stroke-linecap="round"/>
+      </svg>
+      <span class="lbl">Completato:</span> <b id="pctLabel">0%</b>
+    </div>
+  </div>
+  <div class="ad-banner-slot" id="adBannerSlot"></div>
+</header>
+
+<div class="shell">
+  <section class="hero">
+    <span class="eyebrow">Sorveglianza di massa · UE · basato su exitchatcontrol.org</span>
+    <h1>Tracker Sovranità Digitale</h1>
+    <p class="lead">Chat Control vuole scansionare i tuoi messaggi privati. Qui sotto trovi la checklist operativa, passo dopo passo, per riprendere il controllo di comunicazioni, dati e strumenti. Scegli il tuo profilo, spunta ciò che fai, il resto lo ricordo io.</p>
+
+    <div class="profiles" id="profiles">
+      <div class="profile-card" data-level="g">
+        <div class="pt"><span class="sw"></span> 🟢 Cittadino</div>
+        <div class="pd">Vuoi solo che le tue conversazioni smettano di essere scansionate e vendute. Le basi, senza diventare esperto.</div>
+      </div>
+      <div class="profile-card" data-level="y">
+        <div class="pt"><span class="sw"></span> 🟡 Account pseudonimo</div>
+        <div class="pd">Pagina informativa, attivista, creator: separa identità reale e pubblica.</div>
+      </div>
+      <div class="profile-card" data-level="r">
+        <div class="pt"><span class="sw"></span> 🔴 Whistleblower</div>
+        <div class="pd">Giornalista, fonte, avversario forte (Stato, datore di lavoro). Anonimato massimo.</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="search" placeholder="Cerca uno strumento (es. Signal, VPN, password...)">
+      </div>
+      <button class="btn" id="onlyRecBtn">Mostra solo consigliati</button>
+      <button class="btn" id="expandAllBtn">Espandi tutto</button>
+      <button class="btn" id="exportBtn">Esporta progressi</button>
+      <label class="btn" for="importFile" style="margin:0;">Importa</label>
+      <input type="file" id="importFile" accept="application/json" style="display:none;">
+      <button class="btn accent" id="resetBtn">Azzera</button>
+      <button class="btn accent" id="installBtn" style="display:none;">⬇ Installa l'app</button>
+    </div>
+  </section>
+
+  <div class="ad-square-slot" id="adSquareSlot"></div>
+
+  <section class="cat gen-section" id="generatori" style="display:block;">
+    <div class="cat-head" style="cursor:default;">
+      <div class="ic">🔧</div>
+      <div class="ti">
+        <h2>Generatori</h2>
+        <div class="sub">Strumenti che girano solo nel tuo browser. Nessuna chiave, nessun dato lascia questo dispositivo.</div>
+      </div>
+    </div>
+    <div class="cat-body" style="display:block;">
+      <div class="gen-grid">
+
+        <div class="gen-card">
+          <h3>🔑 Genera una coppia di chiavi PGP</h3>
+          <p class="gen-note">Cifratura reale (ECC Curve25519), generata interamente in locale tramite OpenPGP.js. La prima volta serve una connessione internet per scaricare la libreria (poi resta in cache e funziona offline). La chiave privata non viene mai inviata da nessuna parte.</p>
+          <div class="gen-row">
+            <input type="text" id="pgpName" placeholder="Nome (es. Carluccio)">
+            <input type="email" id="pgpEmail" placeholder="Email">
+          </div>
+          <div class="gen-row">
+            <input type="password" id="pgpPass" placeholder="Passphrase per proteggere la chiave privata (opzionale ma consigliata)">
+          </div>
+          <button class="btn accent" id="pgpGenBtn">Genera chiavi PGP</button>
+          <span class="gen-status" id="pgpStatus"></span>
+
+          <div class="gen-output" id="pgpOutput" style="display:none;">
+            <label>Chiave pubblica <span class="tag-ok">condividila pure</span></label>
+            <textarea id="pgpPub" readonly rows="5"></textarea>
+            <div class="gen-actions">
+              <button class="btn" data-copy="pgpPub">Copia</button>
+              <button class="btn" id="pgpPubDl">Scarica .asc</button>
+            </div>
+
+            <label style="margin-top:12px;">Chiave privata <span class="tag-warn">segreta — non condividerla mai</span></label>
+            <textarea id="pgpPriv" readonly rows="5"></textarea>
+            <div class="gen-actions">
+              <button class="btn" data-copy="pgpPriv">Copia</button>
+              <button class="btn" id="pgpPrivDl">Scarica .asc</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="gen-card">
+          <h3>🛡️ Assembla una configurazione WireGuard</h3>
+          <p class="gen-note">Se il tuo provider (Mullvad, Proton VPN...) ti dà già un file pronto dall'app o dalla dashboard, usa quello: è più semplice. Questo assembla manualmente un file .conf quando hai solo le chiavi grezze — utile per IVPN o un server WireGuard tuo. Nessun dato lascia il browser.</p>
+          <div class="gen-row">
+            <input type="text" id="wgPriv" placeholder="La tua chiave privata (Private Key)">
+          </div>
+          <div class="gen-row">
+            <input type="text" id="wgAddr" placeholder="Indirizzo assegnato, es. 10.64.0.2/32">
+            <input type="text" id="wgDns" placeholder="DNS, es. 10.64.0.1 (opzionale)">
+          </div>
+          <div class="gen-row">
+            <input type="text" id="wgPeerPub" placeholder="Chiave pubblica del server (peer)">
+          </div>
+          <div class="gen-row">
+            <input type="text" id="wgEndpoint" placeholder="Endpoint, es. se-got.mullvad.net:51820">
+            <input type="text" id="wgAllowed" placeholder="AllowedIPs" value="0.0.0.0/0, ::/0">
+          </div>
+          <button class="btn accent" id="wgGenBtn">Genera file .conf</button>
+          <span class="gen-status" id="wgStatus"></span>
+
+          <div class="gen-output" id="wgOutput" style="display:none;">
+            <label>wg0.conf</label>
+            <textarea id="wgConf" readonly rows="9"></textarea>
+            <div class="gen-actions">
+              <button class="btn" data-copy="wgConf">Copia</button>
+              <button class="btn" id="wgDl">Scarica .conf</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <nav class="toc" id="toc"></nav>
+    <main id="main"></main>
+  </div>
+
+  <footer>
+    <span>Contenuti ispirati a <a href="https://exitchatcontrol.org" target="_blank" rel="noopener">exitchatcontrol.org</a> — nessun link traccia, nessun dato lasciato questa pagina.</span>
+    <span>I tuoi progressi restano solo nel tuo browser (localStorage). Installabile come app.</span>
+  </footer>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="toast" id="toast"></div>
+
+<script src="ads-config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ads.js"></script>
+</body>
+</html>
