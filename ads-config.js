@@ -35,8 +35,8 @@ const ADS = {
 
   // Riquadro quadrato dentro la pagina — formato consigliato 300×250.
   square: {
-    imageUrl: "",   // es: "ads/quadrato.jpg"
-    link: "",       // es: "https://sponsor.com"
-    alt: "Sponsor"
+    imageUrl: "banner-lcz-01.gif",   // es: "ads/quadrato.jpg"
+    link: "https://www.amazon.it/dp/B0H5R3BYZ6/ref=cm_sw_r_as_gl_api_gl_i_TSB77XW5S6M4CCRW3GRS?linkCode=ml1&tag=carlucciomig-20&linkId=feaca9597377e3b4e1a3f3f4316fc73d",       // es: "https://sponsor.com"
+    alt: "La Cascina Zero - Fuga dalla gabbia invisibile, ora disponbile su Amazon"
   }
 };
